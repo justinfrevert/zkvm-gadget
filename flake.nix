@@ -45,6 +45,8 @@
             (lib.optionals pkgs.stdenv.isLinux pkgs.mold)
             (lib.optionals pkgs.stdenv.isDarwin pkgs.darwin.apple_sdk.frameworks.Security)
             (lib.optionals pkgs.stdenv.isDarwin pkgs.darwin.apple_sdk.frameworks.SystemConfiguration)
+            # Add AppKit framework for macOS
+            (lib.optionals pkgs.stdenv.isDarwin pkgs.darwin.apple_sdk.frameworks.AppKit)
           ];
           buildInputs = [
             # We want the unwrapped version, wrapped comes with nixpkgs' toolchain

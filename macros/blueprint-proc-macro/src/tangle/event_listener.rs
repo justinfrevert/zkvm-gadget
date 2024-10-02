@@ -90,7 +90,6 @@ pub(crate) fn generate_tangle_event_handler(
 
                     let mut result = Vec::new();
                     #(#result_tokens)*
-
                     let response =
                         TangleApi::tx()
                             .services()

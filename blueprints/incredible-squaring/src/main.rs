@@ -1,5 +1,8 @@
 use color_eyre::{eyre::eyre, Result};
-use gadget_sdk::config::{ContextConfig, GadgetCLICoreSettings, GadgetConfiguration, StdGadgetConfiguration};
+use gadget_sdk::config::{
+    ContextConfig, GadgetCLICoreSettings, GadgetConfiguration, StdGadgetConfiguration,
+};
+// use gadget_sdk::events_watcher::substrate::EventHandlerWithRetry;
 use gadget_sdk::{
     config::Protocol,
     events_watcher::{substrate::SubstrateEventWatcher, tangle::TangleEventsWatcher},
@@ -9,17 +12,12 @@ use gadget_sdk::{
     },
     tx,
 };
+
 use std::io::Write;
 use incredible_squaring_blueprint as blueprint;
 use structopt::StructOpt;
 use gadget_sdk::run::GadgetRunner;
 use gadget_sdk::tangle_subxt::tangle_testnet_runtime::api::runtime_types::tangle_primitives::services::PriceTargets;
-
-// #[async_trait::async_trait]
-// trait GadgetRunner {
-//     async fn register(&self) -> Result<()>;
-//     async fn run(&self) -> Result<()>;
-// }
 
 struct TangleGadgetRunner {
     env: GadgetConfiguration<parking_lot::RawRwLock>,
@@ -75,14 +73,17 @@ impl GadgetRunner for TangleGadgetRunner {
 
     async fn run(&self) -> Result<()> {
         let client = self.env.client().await.map_err(|e| eyre!(e))?;
-        let signer = self.env.first_signer().map_err(|e| eyre!(e))?;
+        let signer = self.env.first_signer().unwrap();
+
         let logger = self.env.logger.clone();
 
+        println!("Starting...");
         self.env.logger.info(format!(
             "Starting the event watcher for {} ...",
-            signer.account_id()
+            signer.clone().account_id()
         ));
 
+        println!("Listening for event...");
         let x_square = blueprint::XsquareEventHandler {
             service_id: self.env.service_id.unwrap(),
             signer,
@@ -111,12 +112,16 @@ async fn create_gadget_runner(
     Box<dyn GadgetRunner<Error = color_eyre::Report>>,
 ) {
     let env = gadget_sdk::config::load(Some(protocol), config).expect("Failed to load environment");
+
     match protocol {
         Protocol::Tangle => (env.clone(), Box::new(TangleGadgetRunner { env })),
-        Protocol::Eigenlayer => (
-            env.clone(),
-            Box::new(blueprint::eigenlayer::EigenlayerGadgetRunner::new(env).await),
-        ),
+        Protocol::Eigenlayer => {
+            unimplemented!()
+            //     (
+            //     env.clone(),
+            //     Box::new(blueprint::eigenlayer::EigenlayerGadgetRunner::new(env).await),
+            // )
+        }
     }
 }
 

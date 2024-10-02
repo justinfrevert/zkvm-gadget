@@ -2,6 +2,9 @@
 pragma solidity ^0.8.19;
 
 import "tnt-core/BlueprintServiceManager.sol";
+import "risc0/groth16/Groth16Verifier.sol";
+import {IRiscZeroVerifier} from "risc0/IRiscZeroVerifier.sol";
+
 
 /**
  * @title IncredibleSquaringBlueprint
@@ -11,6 +14,9 @@ import "tnt-core/BlueprintServiceManager.sol";
  */
 
 contract IncredibleSquaringBlueprint is BlueprintServiceManager {
+    constructor(IRiscZeroVerifier _verifier) {
+        verifier = _verifier;
+    }
     /**
      * @dev A mapping of all service operators registered with the blueprint.
      * The key is the operator's address and the value is the operator's details.
@@ -21,6 +27,15 @@ contract IncredibleSquaringBlueprint is BlueprintServiceManager {
      * The key is the service ID and the value is the service operator's address.
      */
     mapping(uint64 => address[]) public serviceInstances;
+
+    /// @notice RISC Zero verifier contract address.
+    IRiscZeroVerifier public immutable verifier;
+
+    // The representation of the journal we'll keep on the contract side
+    struct Journal {
+        // Contents of the journal. In this case, that is just an aribtrary calculation result
+        uint256 result;
+    }
 
 
     /**
@@ -81,15 +96,14 @@ contract IncredibleSquaringBlueprint is BlueprintServiceManager {
         bytes calldata inputs,
         bytes calldata outputs
     ) public view virtual override onlyFromRootChain returns (bool) {
-        // Someone requested to verify the result of a job call.
-        // We need to check if the output is the square of the input.
+        // Decode and validate the journal data 
+        (bytes memory journalData, bytes memory seal, bytes32 imageId) = abi.decode(inputs, (bytes, bytes, bytes32));
 
-        // Decode the inputs and outputs
-        uint256 input = abi.decode(inputs, (uint256));
-        uint256 output = abi.decode(outputs, (uint256));
-        // Check if the output is the square of the input
-        bool isValid = output == input * input;
-        require(isValid, "Invalid result");
+        Journal memory journal = abi.decode(journalData, (Journal));
+        bytes32 journalHash = sha256(inputs);
+
+        // Verify the proof
+        verifier.verify(seal, imageId, journalHash);
 
         return true;
     }

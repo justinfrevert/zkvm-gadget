@@ -1,3 +1,31 @@
+# Gadget with ZKVM Blueprint
+Runs a RISC Zero prover on an arbitrary calculation, compresses its proof, and verifies the proof in the appropriate verifying contract.
+
+# Easy start
+
+### Start Tangle Node
+In Tangle Project:
+```shell
+./scripts/run-standalone-local.sh --clean
+```
+
+### Start Gadget
+Note the log target, which allows you to check the progress of the proof generation and submission
+```shell
+RUST_LOG=gadget=info RUST_BACKTRACE=1 RPC_URL=ws://localhost:9944 KEYSTORE_URI=//./keystore BLUEPRINT_ID=0 cargo r -p incredible-squaring-blueprint run --base-path ./target/keystore --bind-addr=127.0.0.1 --bind-port 9944 --blueprint-id 0 --url ws://localhost:9944 --service-id=0
+```
+
+### Deploy Contracts and Create a Test Job
+cd into blueprints/incredible-squaring
+```shell
+nvm use 18
+yarn
+forge build --root ./contracts
+yarn tsx deploy.ts 
+```
+
+TODO: Steps keystore
+
 <p align="center">
   <img src="https://github.com/webb-tools/dkg-substrate/raw/master/assets/webb_banner_light.png" alt="Gadget Logo">
 </p>

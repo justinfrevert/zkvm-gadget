@@ -12,40 +12,14 @@
   "jobs": [
     {
       "metadata": {
-        "name": "xsquare_eigen",
-        "description": "Returns x^2 saturating to [`u64::MAX`] if overflow occurs."
-      },
-      "params": [
-        {
-          "Struct": [
-            "U256",
-            []
-          ]
-        },
-        "Uint32",
-        "Bytes",
-        "Uint32"
-      ],
-      "result": [
-        {
-          "Struct": [
-            "respondToTaskCall",
-            []
-          ]
-        }
-      ],
-      "verifier": "None"
-    },
-    {
-      "metadata": {
         "name": "xsquare",
-        "description": "Returns x^2 saturating to [`u64::MAX`] if overflow occurs."
+        "description": null
       },
       "params": [
         "Uint64"
       ],
       "result": [
-        "Uint64"
+        "Bytes"
       ],
       "verifier": {
         "Evm": "contracts/out/IncredibleSquaringBlueprint.sol/IncredibleSquaringBlueprint.json"

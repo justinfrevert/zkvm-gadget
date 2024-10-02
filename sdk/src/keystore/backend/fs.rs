@@ -95,6 +95,7 @@ impl FilesystemKeystore {
         let key_type = key_type.to_be_bytes();
         let prefix = hex::encode(key_type);
         let res = fs::read_dir(&self.root);
+
         match res {
             Ok(r) => Box::new(r.filter_map(move |entry| {
                 let entry = entry.ok()?;

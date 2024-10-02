@@ -9,6 +9,7 @@ target/
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+blueprints/incredible-squaring/contracts/lib/
 
 # Added by cargo
 
@@ -20,3 +21,5 @@ target/
 certs
 .DS_Store
 CODEGEN_LOCK
+
+node_modules

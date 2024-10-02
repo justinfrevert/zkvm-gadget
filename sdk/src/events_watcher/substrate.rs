@@ -112,7 +112,7 @@ where
         client: OnlineClient<RuntimeConfig>,
         handlers: Vec<EventHandlerFor<RuntimeConfig>>,
     ) -> Result<(), Error> {
-        const MAX_RETRY_COUNT: usize = 5;
+        const MAX_RETRY_COUNT: usize = 2;
 
         let backoff = ExponentialBuilder::default().with_max_times(usize::MAX);
         let task = || async {
@@ -135,6 +135,7 @@ where
                     }
                 }
                 let events = latest_block.events().map_err(Into::<Error>::into).await?;
+
                 tracing::trace!("Found #{} events", events.len());
                 // wraps each handler future in a retry logic, that will retry the handler
                 // if it fails, up to `MAX_RETRY_COUNT`, after this it will ignore that event for
@@ -142,7 +143,7 @@ where
                 let tasks = handlers.iter().map(|handler| {
                     // a constant backoff with maximum retry count is used here.
                     let backoff = ConstantBuilder::default()
-                        .with_delay(Duration::from_millis(100))
+                        .with_delay(Duration::from_millis(300_000))
                         .with_max_times(MAX_RETRY_COUNT);
                     handler.handle_events_with_retry(
                         client.clone(),

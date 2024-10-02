@@ -231,9 +231,11 @@ pub trait BackendExt: Backend {
             .iter_sr25519()
             .next()
             .ok_or_else(|| Error::Sr25519(SignatureError::InvalidKey))?;
+
         let secret = self
             .expose_sr25519_secret(&first_key)?
             .ok_or_else(|| Error::Sr25519(SignatureError::InvalidKey))?;
+
         let schnorrkel_kp = schnorrkel::Keypair::from(secret);
         let res = PairSigner::new(schnorrkel_kp.into());
         Ok(res)
