@@ -12,11 +12,11 @@ In Tangle Project:
 ### Start Gadget
 Note the log target, which allows you to check the progress of the proof generation and submission
 ```shell
-RUST_LOG=gadget=info RUST_BACKTRACE=1 RPC_URL=ws://localhost:9944 KEYSTORE_URI=//./keystore BLUEPRINT_ID=0 cargo r -p incredible-squaring-blueprint run --base-path ./target/keystore --bind-addr=127.0.0.1 --bind-port 9944 --blueprint-id 0 --url ws://localhost:9944 --service-id=0
+RUST_LOG=gadget=info RUST_BACKTRACE=1 RPC_URL=ws://localhost:9944 KEYSTORE_URI=//./keystore BLUEPRINT_ID=0 cargo r -p zkvm-blueprint run --base-path ./target/keystore --bind-addr=127.0.0.1 --bind-port 9944 --blueprint-id 0 --url ws://localhost:9944 --service-id=0
 ```
 
 ### Deploy Contracts and Create a Test Job
-cd into blueprints/incredible-squaring
+cd into blueprints/zkvm
 ```shell
 nvm use 18
 yarn
