@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "name": "zkvm-blueprint",
+    "description": "A Simple Blueprint to demo how blueprints work on Tangle Network",
+    "author": "Webb Technologies Inc.",
+    "category": null,
+    "code_repository": "https://github.com/webb-tools/gadget",
+    "logo": null,
+    "website": "https://tangle.tools",
+    "license": "MIT OR Apache-2.0"
+  },
+  "jobs": [
+    {
+      "metadata": {
+        "name": "xsquare",
+        "description": null
+      },
+      "params": [
+        "Uint64"
+      ],
+      "result": [
+        "Bytes"
+      ],
+      "verifier": {
+        "Evm": "contracts/out/ZkvmBlueprint.sol/ZkvmBlueprint.json"
+      }
+    }
+  ],
+  "registration_hook": "None",
+  "registration_params": [],
+  "request_hook": "None",
+  "request_params": [],
+  "gadget": {
+    "Wasm": {
+      "runtime": "Wasmtime",
+      "sources": []
+    }
+  }
+}

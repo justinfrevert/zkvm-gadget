@@ -14,11 +14,6 @@ import { Keyring } from "@polkadot/keyring";
 import * as blueprint from "./blueprint.json";
 import { AddressOrPair, SubmittableExtrinsic } from "@polkadot/api/types";
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-
 const tangle = defineChain({
   id: 3287,
   name: "Tangle Testnet",
@@ -63,7 +58,7 @@ const publicClient = createPublicClient({
   transport: http(),
 });
 
-const deployContract = async (path: string, constructorArgs: any[] = []) => {
+const deployContract = async (path: string) => {
   const json = await fs.readFile(path, "utf-8");
   const contractJson = JSON.parse(json);
   const contractAddress = getContractAddress({
@@ -79,51 +74,30 @@ const deployContract = async (path: string, constructorArgs: any[] = []) => {
     abi: contractJson.abi as [],
     bytecode: contractJson.bytecode.object,
     account: DEPLOYER,
-    args: constructorArgs,  // Pass constructor arguments here
   });
   return contractAddress;
 };
 
-console.log("|- Registering Alice as an Operator with bondAmount...");
+console.log("|- Using account to deploy contracts...", DEPLOYER.address);
+console.log("|-- Deploying contracts...");
+for (const job of blueprint.jobs) {
+  // get the absolute path of the contract
+  const realPath = path.resolve(job.verifier.Evm);
+  const verifier = await deployContract(realPath);
+  job.verifier.Evm = verifier;
+  console.log(
+    `|--- Verifier contract for ${job.metadata.name} deployed at: ${verifier}`,
+  );
+}
+
+console.log();
+
 const api = await ApiPromise.create({
   provider: new WsProvider("ws://localhost:9944"),
   noInitWarn: true,
 });
 
 await api.isReady;
-
-const bondAmount = 99999; // bond amount from the UI
-const joinOperatorsTx = api.tx.multiAssetDelegation.joinOperators(bondAmount);
-await signAndSend(aliceSr25519, joinOperatorsTx);
-
-console.log("|- Using account to deploy contracts...", DEPLOYER.address);
-console.log("|-- Deploying contracts...");
-
-// Step 1: Deploy the Groth16 Verifier contract
-const verifierAddress = await deployContract("contracts/out/Groth16Verifier.sol/Groth16Verifier.json");
-console.log(`|--- Groth16 Verifier contract deployed at: ${verifierAddress}`);
-
-
-await sleep(7000)
-
-for (const job of blueprint.jobs) {
-  console.log(`Job verifier Evm path: ${job.verifier?.Evm}`);
-  // get the absolute path of the contract
-  const realPath = path.resolve(job.verifier.Evm);
-
-  // Find our selector contract to pass a specific constructor value to it
-  if (job.metadata.name === "xsquare") {
-      const verifier = await deployContract(realPath, [verifierAddress]);
-
-      job.verifier.Evm = verifier;
-      console.log(
-        `|--- Verifier contract for ${job.metadata.name} deployed at: ${verifier}`,
-      );
-  }
-}
-
-console.log();
-
 const blueprintId = await api.query.services.nextBlueprintId();
 
 const createBlueprintTx = api.tx.services.createBlueprint(blueprint);
