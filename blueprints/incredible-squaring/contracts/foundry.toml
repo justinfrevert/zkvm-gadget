@@ -4,5 +4,5 @@ out = "out"
 libs = ["lib"]
 solc_version = "0.8.20"
 
-[dependencies]
+[profile.dependencies]
 risc0-ethereum = { git = "https://github.com/risc0/risc0-ethereum", tag = "v1.0.0" }

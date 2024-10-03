@@ -1,6 +1,10 @@
-## Incredible Squaring Blueprint
+## ZKVM Example Blueprint
 
-A simple blueprint that only has one job that takes **x** and returns **x<sup>2</sup>**.
+A simple blueprint that computes a result in a ZKVM and sends a proof to be verified by its own contract. Upon noting a job event, the gadget will respond by generating an arbitrary proof, compressing it for verification within the EVM, and then respond to the event by sending the proof to the contract verifier.
+
+## RISC Zero
+
+- RISC Zero is a ZKVM which can generate proofs which can be verified in the EVM. See [more](https://github.com/risc0/risc0). The core logic which invokes the ZKVM guest and runs the custom logic inside is in `./methods`.
 
 ## Building the Blueprint
 
